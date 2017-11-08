@@ -61,7 +61,7 @@ module.exports.loadUsers = function () {
 
 module.exports.deleteUsers = async function () {
   console.log('FETCHING ALL USERS')
-  const response = await axios.get(`${kualiBase}/api/v1/users?schoolId=${SCHOOL_ID}`, { headers })
+  const response = await axios.get(`${kualiBase}/api/v1/users?limit=500&schoolId=${SCHOOL_ID}`, { headers })
   const users = response.data
 
   await Bluebird.map(users, async user => {
