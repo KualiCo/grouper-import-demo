@@ -41,12 +41,25 @@ module.exports.run = async function () {
     }
   })
   await Bluebird.map(grouperResults, async g => {
+    const members = await getAssociatedUsers(g)
+    console.log(g.name, 'members', members)
     const newGroup = {
       name: g.displayExtension,
       fields: [
         {
           id: 'grouperId',
           value: g.uuid
+        }
+      ],
+      roleSchemas: [
+        { id: 'Member', name: 'Member', description: 'All members' }
+      ],
+      roles: [
+        {
+          id: 'Member',
+          value: [
+            /* userids go here */
+          ]
         }
       ]
     }
@@ -59,8 +72,6 @@ module.exports.run = async function () {
     } else {
       await createGroup(newGroup)
     }
-    const members = await getAssociatedUsers(g)
-    console.log(g.name, 'members', members)
   })
 }
 
