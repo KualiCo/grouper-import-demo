@@ -1,6 +1,6 @@
 const axios = require('axios')
 const Bluebird = require('bluebird')
-const { get, find } = require('lodash')
+const { get, find, map, filter } = require('lodash')
 
 const {
   grouperUsername,
@@ -59,6 +59,8 @@ module.exports.run = async function () {
     } else {
       await createGroup(newGroup)
     }
+    const members = await getAssociatedUsers(g)
+    console.log(g.name, 'members', members)
   })
 }
 
@@ -94,6 +96,35 @@ function getField (group, fieldId) {
   }
 
   return result
+}
+
+async function getAssociatedUsers (group) {
+  const { data } = await axios.post(
+    `${grouperBase}${groupsPath}`,
+    {
+      WsRestGetMembersRequest: {
+        subjectAttributeNames: ['description', 'loginid', 'name'],
+        wsGroupLookups: [
+          {
+            groupName: group.name
+          }
+        ]
+      }
+    },
+    {
+      headers: {
+        'Content-Type': 'text/x-json',
+        Authorization: 'Basic YmFuZGVyc29uOnBhc3N3b3Jk'
+      }
+    }
+  )
+  const members = map(
+    filter(get(data, 'WsGetMembersResults.results[0].wsSubjects', []), s => {
+      return s.sourceId === 'ldap'
+    }),
+    s => ({ username: s.id })
+  )
+  return members
 }
 
 async function createGroup (newGroup) {
