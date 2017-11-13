@@ -51,12 +51,9 @@ module.exports.run = async function () {
           value: g.uuid
         }
       ],
-      roleSchemas: [
-        { id: 'Member', name: 'Member', description: 'All members' }
-      ],
       roles: [
         {
-          id: 'Member',
+          id: 'members',
           value: [
             /* userids go here */
           ]
