@@ -40,9 +40,23 @@ module.exports.run = async function () {
       'Content-Type': 'application/json'
     }
   })
+  const users = await axios.get(`${kualiBase}/api/v1/users/?limit=10000`, {
+    headers: {
+      Authorization: `Bearer ${kualiToken}`,
+      'Content-Type': 'application/json'
+    }
+  })
+
+  const usersMap = {}
+  users.data.forEach((user) => {
+    usersMap[user.username] = user.id
+  })
+
   await Bluebird.map(grouperResults, async g => {
     const members = await getAssociatedUsers(g)
-    console.log(g.name, 'members', members)
+    const groupMembers = members.map(member => {
+      return usersMap[member.username]
+    })
     const newGroup = {
       name: g.displayExtension,
       fields: [
@@ -51,15 +65,10 @@ module.exports.run = async function () {
           value: g.uuid
         }
       ],
-      roleSchemas: [
-        { id: 'Member', name: 'Member', description: 'All members' }
-      ],
       roles: [
         {
-          id: 'Member',
-          value: [
-            /* userids go here */
-          ]
+          id: 'members',
+          value: groupMembers
         }
       ]
     }

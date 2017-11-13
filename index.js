@@ -1,5 +1,5 @@
 const program = require('commander')
-const { run, deleteGroups } = require('./groups')
+const { run, deleteAllGroups } = require('./groups')
 const { loadUsers, deleteUsers } = require('./users')
 
 program
@@ -15,7 +15,7 @@ program
   .description('Delete groups added from grouper')
   .action(function () {
     console.log('Deleting Groups')
-    deleteGroups()
+    deleteAllGroups()
   })
 
 program
